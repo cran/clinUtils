@@ -1,43 +1,13 @@
-context("Convert to DT wrapper")
+context("Get an interactive DataTables for clinical data")
 
 # require extra libraries
-library(dplyr) # for tibble
-
+library(tibble)
 library(crosstalk)
-library(xml2)
-library(jsonlite)
 
-tmpdir <- tempdir()
-
-# utility function to get JSON table from exported HTML file
-getTableJSON <- function(file) {
-  
-	tableHTML <- read_html(file)
-	# extract table in JSON format
-	tableXMLJSON <- xml_find_all(tableHTML, ".//script[@type='application/json']")
-	# extract table as text
-	tableXMLJSONTxt <- xml_text(tableXMLJSON)
-	# convert table to df
-	# by default, converted to a matrix, so lose class
-	tableJSON <- jsonlite::fromJSON(txt = tableXMLJSONTxt, simplifyMatrix = FALSE, simplifyDataFrame = TRUE)
-	return(tableJSON)
-}
-
-# export table and get JSON table
-exportAndGetTableJSON <- function(dt) {
-  
-	file <- file.path(tempdir(), "table.html")
-	htmlwidgets::saveWidget(dt, file = file)
-	tableJSON <- getTableJSON(file = file)
-	unlink(file)
-	return(tableJSON)
-    
-}
-
-test_that("basic", {
+test_that("A basic DataTables is correctly exported", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		stringsAsFactors = FALSE
@@ -47,26 +17,16 @@ test_that("basic", {
 	expect_is(dt, "datatables")	
 	expect_identical(object = dt$x$data, expected = data)
 	
-	# check than output contains all columns/rows in correct order
-	file <- file.path(tmpdir, "table-basic.html")
-	htmlwidgets::saveWidget(dt, file = file)
-	
-	tableData <- getTableJSON(file)$x$data
-	tableData <- do.call(data.frame, c(tableData, list(stringsAsFactors = FALSE)))
-	expect_true(all(tableData == data))
-	# Note: difference in mode (e.g. Date <-> character), and in converted characters (e.g. <  -> &lt;) can be reported
-	
-	unlink(file)
-	
-	# wrong type
-	expect_error(getClinDT(data = TRUE))
-	
 })
 
-test_that("SharedData", {
+test_that("An error is generated if data is of the wrong type", {
+	expect_error(getClinDT(data = TRUE))
+})
+
+test_that("SharedData DataTables are correctly generated", {
 	
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		stringsAsFactors = FALSE
@@ -77,75 +37,97 @@ test_that("SharedData", {
 	expect_silent(dt <- getClinDT(data = dataSD))
 	expect_identical(dt$x$data, data)
 	
-	# incorrect
+})
+
+test_that("An error is generated if a SharedData with incorrect key is set", {
+
 	expect_error(dt <- getClinDT(crosstalk::SharedData$new(data = data, key = "test")))
 	
 })
 
-test_that("tibble", {
+test_that("A DataTables is correctly generated when input table is a tibble", {
 		
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		stringsAsFactors = FALSE
 	)		
 			
-	dataTB <- data %>% group_by(USUBJID)
+	dataTB <- tibble::as_tibble(data)
 	expect_silent(dt <- getClinDT(data = dataTB))
 	expect_identical(dt$x$data, data)
+	
 })
 
-test_that("Colnames", {
+test_that("Column names are successfully renamed in DataTables", {
 	
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		stringsAsFactors = FALSE
 	)
 	colnames <- c(
+		"Sex" = "SEX",
 		"Subject ID" = "USUBJID",
-		"Treatment" = "TRT",
-		"Sex" = "SEX"
+		"Treatment" = "TRT"
 	)
 			
 	# correct
 	expect_silent(dt <- getClinDT(data = data, colnames = colnames))
-	tableJSON <- exportAndGetTableJSON(dt)
-	headerTh <- xml_find_all(read_html(tableJSON$x$container), "//th")
-	expect_identical(sapply(headerTh, xml_text), names(colnames))
+	expect_match(
+		object = dt$x$container,
+		regexp = ".+<th>Subject ID</th>.+<th>Treatment</th>.+<th>Sex</th>.+"
+	)
 	
-	# wrong
+})
+
+test_that("A warning is generated if column names are not correctly specified", {
+		
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		SEX = c("F", "M", "F", "M", "F"),
+		stringsAsFactors = FALSE
+	)
 	expect_warning(dt <- getClinDT(data = data, colnames = c(TEST = "TEST")))
 			
 })
 
-test_that("Specify non visible columns", {
+test_that("A warning is generated if the old specification for non visible var is used", {
 	
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		stringsAsFactors = FALSE
-	)		
-			
-	nonVisibleVar <- "TRT"
+	)
 	
 	# old spec
 	expect_warning(
 		dt <- getClinDT(
 			data = data, 
-			nonVisible = match(nonVisibleVar, colnames(data))-1
+			nonVisible = match("TRT", colnames(data))-1
 		),
 		regex = "deprecated"
 	)
 
-	# new spec
+})
+
+test_that("Invisible columns are not shown in the DataTables output", {
+
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		SEX = c("F", "M", "F", "M", "F"),
+		stringsAsFactors = FALSE
+	)
+
 	expect_silent(
 		dt <- getClinDT(
 			data = data, 
-			nonVisibleVar = nonVisibleVar
+			nonVisibleVar = "TRT"
 		)
 	)
 	cDefs <- dt$x$options$columnDefs
@@ -153,12 +135,28 @@ test_that("Specify non visible columns", {
 	expect_true(any(cDefsNonVisible))
 	expect(cDefs[[which(cDefsNonVisible)]]$targets, 1)
 	
+})
+
+test_that("An error is generated if invisible columns are incorrectly specified", {
+			
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		SEX = c("F", "M", "F", "M", "F"),
+		stringsAsFactors = FALSE
+	)
+			
 	# in case JS indices not used
-	expect_error(getClinDT(data = data, nonVisible = ncol(data)))
+	expect_warning(
+		expect_error(	
+			getClinDT(data = data, nonVisible = ncol(data)),
+			"Javascript indexing"
+		)
+	)
 	
 })
 
-test_that("Format percentage var", {
+test_that("Percentages are correctly formatted", {
 			
 	expect_silent(
 		dt <- getClinDT(
@@ -176,36 +174,72 @@ test_that("Format percentage var", {
 	
 })
 
-test_that("Barplot for a variable", {
+test_that("A warning is generated if the variable for barplot is not available", {
 	
 	data <- data.frame(
-		USUBJID = as.character(sample.int(5)),
-		TRT = c("A", "A", "B", "B", "B"),
-		SEX = c("F", "M", "F", "M", "F"),
+		USUBJID = as.character(1:5),
 		AGE = c(20, 40, 67, 36, 50),
-		WEIGHTBL = c(60, 45, 89, 120, 78),
 		stringsAsFactors = FALSE
-	)		
-			
-	# variable not available
+	)	
+
 	expect_warning(getClinDT(data = data, barVar = "blabla"))
+
+})
+	
+test_that("Barplot are correctly rendered within DataTables", {			
 		
+	data <- data.frame(
+		USUBJID = as.character(1:5),
+		AGE = c(20, 40, 67, 36, 50),
+		stringsAsFactors = FALSE
+	)
+			
 	# specification of variable for the bar
 	expect_silent(dt <- getClinDT(data = data, barVar = "AGE"))
 	rCB <- dt$x$options$rowCallback
 	expect_match(object = rCB, regex = ".*color.*")
-	expect_match(object = rCB, regexp = "data[3]", fixed = TRUE)
+	expect_match(object = rCB, regexp = "data[1]", fixed = TRUE)
+	
+})
 
-	# specification of color threshold for the bar
+test_that("A threshold for the barplot is correctly set", {			
+
+	data <- data.frame(
+		USUBJID = as.character(1:5),
+		AGE = c(20, 40, 67, 36, 50),
+		stringsAsFactors = FALSE
+	)
+			
 	expect_silent(dt <- getClinDT(data = data, barVar = "AGE", barColorThr = 28))
 	rCB <- dt$x$options$rowCallback
-	expect_match(object = rCB, regex = ".*data\\[3\\].*28.*")
+	expect_match(object = rCB, regex = ".*data\\[1\\].*28.*")
+	
+})
+
+test_that("A range for the barplot is correctly set", {			
+			
+	data <- data.frame(
+		USUBJID = as.character(1:5),
+		AGE = c(20, 40, 67, 36, 50),
+		stringsAsFactors = FALSE
+	)
 	
 	# specification of range for the bar
 	expect_silent(dt <- getClinDT(data = data, barVar = "AGE", barRange = c(0, 100)))
 	rCB <- dt$x$options$rowCallback
 	expect_match(object = rCB, regex = "100")
 	
+})
+
+test_that("A range for the barplots of multiple variables is correctly set", {			
+				
+	data <- data.frame(
+		USUBJID = as.character(1:5),
+		AGE = c(20, 40, 67, 36, 50),
+		WEIGHTBL = c(60, 45, 89, 120, 78),
+		stringsAsFactors = FALSE
+	)
+			
 	# multiple variables
 	expect_silent(
 		dt <- getClinDT(
@@ -216,17 +250,21 @@ test_that("Barplot for a variable", {
 		)
 	)
 	rCB <- dt$x$options$rowCallback
-	expect_match(object = rCB, regex = ".*data\\[3\\].*data\\[4\\]")
+	expect_match(object = rCB, regex = ".*data\\[1\\].*data\\[2\\]")
+	
+})
 
-	# wrong types
+test_that("A warning is generated is a variable for a barplot is not numeric", {			
+
+	data <- data.frame(USUBJID = as.character(1:5))
 	expect_warning(dt <- getClinDT(data = data, barVar = "USUBJID"))
 	
 })
 
-test_that("Filter boxes", {
+test_that("The location of the filter box is correctly set", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE	
 	)
@@ -235,18 +273,17 @@ test_that("Filter boxes", {
 	for(filter in filters){
 		
 		dt <- getClinDT(data, filter = filter)
-		tableJSON <- exportAndGetTableJSON(dt)
-		tableFilter <- tableJSON$x$filter
+		tableFilter <- dt$x$filter
 		expect_identical(tableFilter, filter)
 		
 	}
 			
 })
 
-test_that("Search box", {
+test_that("The search box is correctly enabled or disabled in the DataTables", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE	
 	)
@@ -254,73 +291,76 @@ test_that("Search box", {
 	for(includeSearchBox in c(TRUE, FALSE)){		
 			
 		dt <- getClinDT(data, searchBox = includeSearchBox)
-		tableJSON <- exportAndGetTableJSON(dt)
-		expect_equal(grepl("f", tableJSON$x$options$dom), includeSearchBox)
+		expect_equal(grepl("f", dt$x$options$dom), includeSearchBox)
 		
 	}
 	
 })
 
-test_that("Page length", {
+test_that("The number of records (page length) is correctly set", {
 
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE	
 	)
 			
 	dt <- getClinDT(data, pageLength = 2)
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_equal(tableJSON$x$options$pageLength, 2) # page length properly set
-	expect_true(grepl("p", tableJSON$x$options$dom)) # include pagination control
+	expect_equal(dt$x$options$pageLength, 2) # page length properly set
+	expect_true(grepl("p", dt$x$options$dom)) # include pagination control
+
 })
 
-test_that("Fixed columns", {
+test_that("Fixed columns are correctly specified in the DataTables", {
 	
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE	
 	)
 			
 	fC <- list(leftColumns = 2)
 	dt <- getClinDT(data, fixedColumns = fC)
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_equal(tableJSON$x$options$fixedColumns, fC)
+	expect_equal(dt$x$options$fixedColumns, fC)
+	
 })
 
-test_that("Columns widths", {	
+test_that("Columns widths are correctly specified in the DataTables", {	
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
 		
-	widths <- sample(10, ncol(data), replace = TRUE)
+	widths <- c(3, 7)
 	dt <- getClinDT(data, columnsWidth = widths)
-	tableJSON <- exportAndGetTableJSON(dt)
 	
 	# extract column defs
-	cDefs <- tableJSON$x$options$columnDefs
+	cDefs <- dt$x$options$columnDefs
+	cDefs <- unlist(cDefs, recursive = FALSE)
 	
-	# and column widths
-	if(!is.data.frame(cDefs)){ # list if multiple column defs
-		idxColDefs <- which(sapply(cDefs, function(x) "columnsWidth" %in% colnames(x)))
-		expect_length(idxColDefs, 1) # is column width specified?
-		cDefs <- cDefs[[idxColDefs]]
-	}
+	idxColDefs <- which(sapply(cDefs, function(x) "columnsWidth" %in% names(x)))
+	cDefs <- cDefs[idxColDefs]
+	
+	cDefsDf <- do.call(rbind.data.frame, cDefs)
 	
 	# check if match specified width:
-	cColWidths <- cDefs[match(seq_along(widths), cDefs$targets), "columnsWidth"]
-	expect_equal(cColWidths, widths)
+	expect_equal(
+		object = cDefsDf[which(cDefsDf$targets == 1), "columnsWidth"],
+		expected = 3
+	)
+	expect_equal(
+		object = cDefsDf[which(cDefsDf$targets == 2), "columnsWidth"],
+		expected = 7
+	)
 	
 })
 
-test_that("Specification of extra options", {
+test_that("Extra options with default values are correctly overwritten when they are specified", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
@@ -330,22 +370,29 @@ test_that("Specification of extra options", {
 		dt <- getClinDT(data, options = list(pageLength = 20)),
 		regexp = "overwrites the default"
 	)
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_equal(tableJSON$x$options$pageLength, 20) # page length properly set
+	expect_equal(dt$x$options$pageLength, 20) # page length properly set
 	
-	# extra options not available in the function
+})
+
+test_that("Extra options without default values are correctly set", {
+			
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		stringsAsFactors = FALSE
+	)
+	
 	expect_silent(dt <- getClinDT(data, options = list(lengthChange = 20)))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_equal(tableJSON$x$options[["lengthChange"]], 20)
+	expect_equal(dt$x$options[["lengthChange"]], 20)
 	
 	# Note: wrong 'options' are handled by the JS DataTable library
 
 })
 
-test_that("Expand variables", {
+test_that("A single expanded variable is correctly handled in the DataTables", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE	
 	)
@@ -354,34 +401,38 @@ test_that("Expand variables", {
 	# so check at least than the HTML is well specified
 			
 	# test in combination of colnames
-	expandVar <- sample(colnames(data), ncol(data)/2)
+	expandVar <- "USUBJID"
 	colnames <- c(
 		"Subject ID" = "USUBJID",
 		"Treatment" = "TRT"
 	)
 	
 	expect_silent(dt <- getClinDT(data, expandVar = expandVar, colnames = colnames))
-	tableJSON <- exportAndGetTableJSON(dt)
-	cDefs <- tableJSON$x$options$columnDefs
+	cDefs <- dt$x$options$columnDefs
 	
 	# target columns are hidden
-	expect_silent(cColsHidden <- unlist(subset(cDefs, !visible)$targets))
-	expect_setequal(object = cColsHidden, expected = match(expandVar, colnames(data)))
+	idxColsHidden <- which(sapply(cDefs, function(x) "visible" %in% names(x) && !isTRUE(x$visible)))
+	expect_length(idxColsHidden, 1)
+	expect_setequal(object = idxColsHidden, expected = match(expandVar, colnames(data)))
 	
 	# and correct variables specified in JS callback
 	expandVarLab <- names(colnames)[match(expandVar, colnames)]
-	expect_true(all(sapply(expandVarLab, grepl, tableJSON$x$callback, fixed = TRUE)))
+	expect_true(all(sapply(expandVarLab, grepl, dt$x$callback, fixed = TRUE)))
 	
-	# wrong variable
+})
+
+test_that("A warning is generated if a expanded variable is not available", {
+		
+	data <- data.frame(USUBJID = 1:5)
 	expect_warning(dt <- getClinDT(data, expandVar = "blabla"))
 			
 })
 
 
-test_that("Expand variables with all column options", {
+test_that("Multiple column specifications at once are correctly handled in the DataTables", {
 	
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		AGE = c(20, 40, 67, 36, 50),
@@ -411,36 +462,40 @@ test_that("Expand variables with all column options", {
 			))
 		)
 	)
-	tableJSON <- exportAndGetTableJSON(dt)
-	cDefs <- tableJSON$x$options$columnDefs
+	cDefs <- dt$x$options$columnDefs
 	
 	# escape (first column is the '+')
-	expect_identical(tableJSON$x$data[[2]], dataEscape[, "url"])
+	expect_identical(dt$x$data[[2]], dataEscape[, "url"])
 	
 	# bar (+1: extra col, -1: JS)
-	idxBarVar <- match(barVar, colnames(dataEscape))
-	expect_true(grepl("color", tableJSON$x$options$rowCallback))
+	expect_true(grepl("color", dt$x$options$rowCallback))
 	
 	# non visible vars: expand and non-visible (+1: extra col, -1: JS)
 	idxNonVisible <- match(c(nonVisibleVar, expandVar), colnames(dataEscape))
+	idxCDefsNonVisible <- which(sapply(cDefs, function(x) 
+		"visible" %in% names(x) && !x$visible
+	))
 	expect_setequal(
-		unlist(subset(cDefs, !visible)$targets),
+		cDefs[[idxCDefsNonVisible]]$targets,
 		expected = idxNonVisible
 	)
 	
 	# extra column defs
+	idxCDefsCtrl <- which(sapply(cDefs, function(x) 
+		"className" %in% names(x) && x$className == "dt-left"
+	))
 	expect_setequal(
-		unlist(subset(cDefs, className == "dt-left")$targets),
+		cDefs[[idxCDefsCtrl]]$targets,
 		expected = cAlignLeft+1 # +1: one extra column added
 	)
 	
 })
 
 
-test_that("Expand cells", {
+test_that("Cells can be correctly expanded in DataTables", {
 		
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		SEX = c("F", "M", "F", "M", "F"),
 		stringsAsFactors = FALSE
@@ -449,70 +504,118 @@ test_that("Expand cells", {
 	# Expand mechanism done in Javascript
 	# so check at least than the HTML is well specified
 	
-	# wrong spec
-	expect_error(dt <- getClinDT(data, expandIdx = list()))
-	
 	# correct spec
 	idxRow <- c(1, 2)
 	idxCol <- c(2, 2)
 	expandIdx <- cbind(row = idxRow, col = idxCol)
 	expect_silent(dt <- getClinDT(data, expandIdx = expandIdx))
-	tableJSON <- exportAndGetTableJSON(dt)
-	cDefs <- tableJSON$x$options$columnDefs
+	cDefs <- dt$x$options$columnDefs
 	
 	# target columns are hidden
-	expect_silent(cColsHidden <- unlist(subset(cDefs, !visible)$targets))
+	idxCDefsNonVisible <- which(sapply(cDefs, function(x) 
+		"visible" %in% names(x) && !x$visible
+	))
+	expect_silent(cColsHidden <- cDefs[[idxCDefsNonVisible]]$targets)
 	expect_setequal(object = cColsHidden, expected = idxCol)
 	
 	# check that values are correct
-	tableJSONData <- tableJSON$x$data
+	dtData <- dt$x$data
 	expandIdxCol <- unique(idxCol)
-	expect_identical(tableJSONData[[expandIdxCol]][-idxRow], data[-idxRow, expandIdxCol]) # column displayed
-	expect_identical(tableJSONData[[expandIdxCol+1]][idxRow], data[idxRow, expandIdxCol]) # hidden column
+	# column displayed
+	expect_identical(
+		object = dtData[[expandIdxCol]][-idxRow], 
+		expected = data[-idxRow, expandIdxCol]
+	)
+	# hidden column
+	expect_identical(
+		object = as.character(dtData[[expandIdxCol+1]][idxRow]), 
+		expected = data[idxRow, expandIdxCol]
+	) 
 	
 })
 
-test_that("Escape cells", {
-		
-	data <- data.frame(
-		USUBJID = sample.int(5),
-		TRT = c("A", "A", "B", "B", "B"),
-		stringsAsFactors = FALSE
-	)	
+test_that("An error is generated if the specification of cells to expand is incorrect", {
+
+	data <- data.frame(USUBJID = 1:5)
+	expect_error(dt <- getClinDT(data, expandIdx = list()))
+
+})
+
+test_that("HTML is correctly escaped by default in the DataTables", {
 			
-	dataEscape <- cbind(
-		url = sprintf('<a href="customlink" target="_blank">%s</a>', data$USUBJID),
-		data,
+	dataEscape <- data.frame(
+		url = sprintf('<a href="customlink" target="_blank">%s</a>', 1:5),
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
 	
-	# no escape
 	expect_silent(dt <- getClinDT(dataEscape))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_false(tableJSON$x$data[[1]][1] == dataEscape[1, "url"])
-	
-	# as logical
-	expect_silent(dt <- getClinDT(dataEscape, escape = FALSE))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_identical(tableJSON$x$data[[1]], dataEscape[, "url"])
-	
-	expect_error(getClinDT(dataEscape, escape = c(TRUE, FALSE)))
-	
-	# as negative integer
-	expect_silent(dt <- getClinDT(dataEscape, escape = -1))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_identical(tableJSON$x$data[[1]], dataEscape[, "url"])
-	
-	# wrong spec
-	expect_error(dt <- getClinDT(dataEscape, escape = "blabla"))
-	expect_error(dt <- getClinDT(dataEscape, escape = ncol(dataEscape) * 2))
+	expect_match(attr(dt$x$options, "escapeIdx"), regexp = "1,2,3")
 	
 })
 
-test_that("Row grouping", {
+test_that("HTML is correctly escaped when specified for all columns at once in the DataTables", {
+			
+	dataEscape <- data.frame(
+		url = sprintf('<a href="customlink" target="_blank">%s</a>', 1:5),
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		stringsAsFactors = FALSE
+	)
+	
+	# as logical
+	expect_silent(dt <- getClinDT(dataEscape, escape = FALSE))
+	expect_false(grepl("1,2,3", attr(dt$x$options, "escapeIdx")))
+	
+	# wrong specification
+	expect_error(
+		getClinDT(dataEscape, escape = c(TRUE, FALSE)),
+		"logical.*of length 1"
+	)
+	
+})
+	
+test_that("HTML is correctly not escaped for a specific column in the DataTables", {
+	
+	dataEscape <- data.frame(
+		url = sprintf('<a href="customlink" target="_blank">%s</a>', 1:5),
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		stringsAsFactors = FALSE
+	)
+			
+	# as negative integer
+	expect_silent(dt <- getClinDT(dataEscape, escape = -1))
+	expect_false(grepl("1", attr(dt$x$options, "escapeIdx")))
+	
+})
+
+test_that("An error is generated when the column to escape is not available", {
+	
+	dataEscape <- data.frame(
+		url = sprintf('<a href="customlink" target="_blank">%s</a>', 1:5),
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		stringsAsFactors = FALSE
+	)
+	
+	# wrong spec
+	expect_error(
+		dt <- getClinDT(dataEscape, escape = "blabla"),
+		"not found in data"
+	)
+	expect_error(
+		dt <- getClinDT(dataEscape, escape = ncol(dataEscape) * 2),
+		"columns not in data"
+	)
+	
+})
+
+test_that("Row grouping is correctly handled in the DataTables", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		STUDYID = rep("study1", each = 5),
 		SITEID = c("a", "b", "c", "a", "c"),
@@ -521,14 +624,18 @@ test_that("Row grouping", {
 			
 	# Note: done in JS
 			
-	# properly done 
 	rowGroupVars <- c("STUDYID", "SITEID")
 	expect_silent(dt <- getClinDT(data, rowGroupVar = rowGroupVars))	
-	tableJSON <- exportAndGetTableJSON(dt)
 	expect_equal(
-		object = tableJSON$x$options$rowGroup$dataSrc, 
+		object = dt$x$options$rowGroup$dataSrc, 
 		expected = match(rowGroupVars, colnames(data))-1
 	)
+	
+})
+
+test_that("A warning is generated when the variable to consider for the row grouping is not available", {
+			
+	data <- data.frame(USUBJID = 1:5)	
 	
 	# variable not available in the data
 	expect_warning(
@@ -536,49 +643,63 @@ test_that("Row grouping", {
 		"not available in the data."
 	)
 	
+})
+
+test_that("A warning is generated when old specification for row grouping is used", {
+			
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		STUDYID = rep("study1", each = 5),
+		SITEID = c("a", "b", "c", "a", "c"),
+		stringsAsFactors = FALSE
+	)	
+	
+	rowGroupVars <- c("STUDYID", "SITEID")
+	
 	# old spec
 	expect_warning(
 		dt <- getClinDT(data, rowGroup = rowGroupVars),
 		"deprecated"
 	)
-	tableJSON <- exportAndGetTableJSON(dt)
 	expect_equal(
-		object = tableJSON$x$options$rowGroup$dataSrc, 
+		object = dt$x$options$rowGroup$dataSrc, 
 		expected = match(rowGroupVars, colnames(data))-1
 	)
 			
 })
 
-test_that("Vertical alignment", {
+test_that("Vertical alignment can be set in the DataTables", {
 	
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)	
 			
 	expect_silent(dt <- getClinDT(data, vAlign = "bottom"))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_true(grepl("'vertical-align':'bottom'", tableJSON$x$options$rowCallback))
+	expect_true(grepl("'vertical-align':'bottom'", dt$x$options$rowCallback))
+	
 })
 
-test_that("callback", {
+test_that("A custom call back Javascript function can be set in the DataTables", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
 	
-	callback <- JS("testCallback")
+	callback <- htmlwidgets::JS("testCallback")
 	expect_silent(dt <- getClinDT(data, callback = callback))
 	expect_true(grepl("testCallback", dt$x$callback))
+	
 })
 
-test_that("Buttons", {
+test_that("Buttons can be correctly specified in the DataTables", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
@@ -586,26 +707,33 @@ test_that("Buttons", {
 	# specify buttons
 	buttons <- "copy"
 	expect_silent(dt <- getClinDT(data, buttons = buttons))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_setequal(tableJSON$x$options$buttons, buttons)
-	expect_true(grepl("B", tableJSON$x$options$dom)) # in DOM
-	expect_true("Buttons" %in% tableJSON$x$extensions) # Js extension specified
+	expect_setequal(dt$x$options$buttons, buttons)
+	expect_true(grepl("B", dt$x$options$dom)) # in DOM
+	expect_true("Buttons" %in% dt$x$extensions) # Js extension specified
 	
-	# no buttons
+})
+
+test_that("Buttons can be unset in the DataTables", {
+			
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		stringsAsFactors = FALSE
+	)
+			
 	expect_silent(dt <- getClinDT(data, buttons = NULL))
-	tableJSON <- exportAndGetTableJSON(dt)
-	expect_length(tableJSON$x$options$buttons, 0)
-	expect_false(grepl("B", tableJSON$x$options$dom))
-	expect_false("Buttons" %in% tableJSON$x$extensions)
+	expect_length(dt$x$options$buttons, 0)
+	expect_false(grepl("B", dt$x$options$dom))
+	expect_false("Buttons" %in% dt$x$extensions)
 			
 	# Note: if uncorrect button specified -> JS error
 	
 })
 
-test_that("x-scrolling", {
+test_that("Scrolling along the x-axis can be correctly set in the DataTables", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
@@ -613,17 +741,16 @@ test_that("x-scrolling", {
 	for(scrollX in c(TRUE, FALSE)){		
 		
 		dt <- getClinDT(data, scrollX = scrollX)
-		tableJSON <- exportAndGetTableJSON(dt)
-		expect_equal(tableJSON$x$options$scrollX, scrollX)
+		expect_equal(dt$x$options$scrollX, scrollX)
 		
 	}
 			
 })
 
-test_that("Extra datatable parameters", {
+test_that("Additional DataTables options can be passed to the DataTables outside of the 'options' parameter", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
@@ -638,24 +765,34 @@ test_that("Extra datatable parameters", {
 				
 })
 
-test_that("Export", {
+test_that("DataTables can be exported to a file", {
 			
 	data <- data.frame(
-		USUBJID = sample.int(5),
+		USUBJID = 1:5,
 		TRT = c("A", "A", "B", "B", "B"),
 		stringsAsFactors = FALSE
 	)
 			
 	# correct file format
-	file <- file.path(tmpdir, "test.html"); unlink(file)
+	file <- tempfile(fileext = ".html")
 	expect_silent(dt <- getClinDT(data, file = file))
 	expect_true(file.exists(file))
-	unlink(file)
 	
+})
+
+test_that("An error is generated if the file to export to has an incorrect extension", {
+			
+	data <- data.frame(
+		USUBJID = 1:5,
+		TRT = c("A", "A", "B", "B", "B"),
+		stringsAsFactors = FALSE
+	)
+
 	# incorrect file format
+	file <- tempfile(fileext = ".csv")
 	expect_error(
-        dt <- getClinDT(data, file = file.path(tmpdir, "test.csv")),
-        pattern = "extension"
-    )
+		dt <- getClinDT(data, file = file),
+		pattern = "extension"
+	)
 	
 })

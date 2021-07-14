@@ -1,13 +1,14 @@
 Package: clinUtils
 Type: Package
 Title: General Utility Functions for Analysis of Clinical Data
-Version: 0.0.1
-Date: 2021-05-26
+Version: 0.0.2
+Date: 2021-07-14
 Authors@R: c(
   person(given = "Laure", family = "Cougnaud", role = "aut",
   email = "laure.cougnaud@openanalytics.eu"),
   person(given = "Michela", family = "Pasetto", role = c("aut", "cre"),
-  email = "michela.pasetto@openanalytics.eu")
+  email = "michela.pasetto@openanalytics.eu"),
+  person(given = "Open Analytics", role = "cph")
   )
 Description: 
  Utility functions to facilitate the import, 
@@ -17,8 +18,10 @@ Description:
  the package functionalities.
 Imports: crosstalk, data.table, DT, haven, htmlwidgets, knitr, plyr,
         tools, utils, viridisLite
-Suggests: dplyr, ggplot2, plotly, htmltools, jsonlite, pander,
-        rmarkdown, testthat, xml2, flextable
+Suggests: dplyr, tibble, ggplot2, plotly, htmltools, pander, rmarkdown,
+        testthat, flextable
+SystemRequirements: pandoc (for inclusion of list of interactive
+        plots/objects with knitr)
 URL: https://github.com/openanalytics/clinUtils
 BugReports: https://github.com/openanalytics/clinUtils/issues
 License: MIT + file LICENSE
@@ -26,9 +29,10 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 LazyData: true
 NeedsCompilation: no
-Packaged: 2021-06-07 13:24:57 UTC; mpasetto
+Packaged: 2021-07-14 12:30:33 UTC; mpasetto
 Author: Laure Cougnaud [aut],
-  Michela Pasetto [aut, cre]
+  Michela Pasetto [aut, cre],
+  Open Analytics [cph]
 Maintainer: Michela Pasetto <michela.pasetto@openanalytics.eu>
 Repository: CRAN
-Date/Publication: 2021-06-08 07:20:02 UTC
+Date/Publication: 2021-07-14 13:20:02 UTC

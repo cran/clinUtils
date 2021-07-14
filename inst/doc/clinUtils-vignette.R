@@ -164,7 +164,7 @@ roundHalfUp(c(0.45, 0.55), 1)
 round(c(0.45, 0.55), 1)
 
 
-## ----getClinDT----------------------------------------------------------------
+## ----getClinDT, eval = rmarkdown::pandoc_available()--------------------------
 
 dataTEAE <- subset(dataADaM$ADAE, SAFFL == "Y" & TRTEMFL == "Y")
 
@@ -215,7 +215,7 @@ tableComparison <- compareTables(
 )
 
 
-## ----compareTables-table-comparison-interactive-------------------------------
+## ----compareTables-table-comparison-interactive, eval = rmarkdown::pandoc_available()----
 tableComparison$`table-comparison-interactive`
 
 ## ----'lab-hist-static1', fig.cap='Barplot of chemistry measurements', fig.width=7, fig.height=4, results = 'asis', echo = FALSE----
@@ -271,7 +271,7 @@ listPlotsInteractiveLB <- sapply(listPlotsLB, function(ggplot)
     , simplify = FALSE)
 
 
-## ----figure-interactive-tagList, warning = FALSE, results = "asis"------------
+## ----figure-interactive-tagList, warning = FALSE, results = "asis", eval = rmarkdown::pandoc_available()----
 
 tagListArgs <- mapply(list,
     # section header
@@ -296,7 +296,7 @@ xList[[2]]
 cat("\n", paste(rep("#", titleLevel), collapse = ""), " Urinalysis\n", sep = "")
 xList[[3]]
 
-## ----figure-interactive-knitPrintListPlots, warning = FALSE, results = "asis"----
+## ----figure-interactive-knitPrintListPlots, warning = FALSE, results = "asis", eval = rmarkdown::pandoc_available()----
 
 knitPrintListPlots(
     plotsList = listPlotsInteractiveLB, 

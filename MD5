@@ -1,4 +1,4 @@
-2d206e67ed01859db6a927745793ee7c *DESCRIPTION
+428a947dfea571dfea042e8ee7d3f626 *DESCRIPTION
 01974937b40279205581a84931ae0cdf *LICENSE
 0d2e78507e26a0cd00904e0ab842fd9f *NAMESPACE
 fedf45298773793e089d6bf41af01133 *R/compareTables.R
@@ -19,9 +19,9 @@ e1f004938b95aa7768f514750e77055e *R/miscellaneous.R
 ad855c424b1d378b4aefce999a56b347 *data/dataSDTMCDISCP01.RData
 d739c581586772f06c74f14b318319f3 *data/shapePaletteNRIND.RData
 26c643fd95176c7a33066dca2be43555 *inst/NEWS
-968e9dbfa74bdbfd4d686022e5b67a9e *inst/doc/clinUtils-vignette.R
-e1310e8abe81091aaedbb470f7b06293 *inst/doc/clinUtils-vignette.Rmd
-9e97d4f9dba9fd3502921467b6ec37a3 *inst/doc/clinUtils-vignette.html
+0c7e3976eea05090f207a999105e8295 *inst/doc/clinUtils-vignette.R
+a4e0794e3f0094ca4e461698aafee38f *inst/doc/clinUtils-vignette.Rmd
+c7963fa2a47d73208d86821ab550fa78 *inst/doc/clinUtils-vignette.html
 ea40f9879933f5cbd0073e99004ad091 *inst/examples/compareTables-example.R
 fda072c2fedf9d25e0ed7f3c72587587 *inst/examples/getClinDT-example.R
 7c7933577f2c091f3d0061c6e7b0ce50 *inst/examples/knitPrintListObjects-example.R
@@ -77,9 +77,9 @@ ccfb3433cf63eae245c9a0aaad8c714c *man/mergeDiffWithData.Rd
 37ed3bcfae31fd313dab18c13add17d9 *man/simpleCap.Rd
 dec61d77c9260d36f6e7159f241baab4 *tests/testthat.R
 355eb0c5b43a144d7b541ee6494fd1c7 *tests/testthat/test_compareTables.R
-01cae3a05c074fb26509f9044e79d37b *tests/testthat/test_getClinDT.R
+1b7cd0127277021880ff1db1a2c1e185 *tests/testthat/test_getClinDT.R
 1b2d80b3358f67288f8a5bf1f49f08a0 *tests/testthat/test_getLabel.R
-1457639c7070cc13b9f99de9434f8990 *tests/testthat/test_knitPrintListPlots.R
+5d0bbc7b6b5ff13842e0da0bd3fa3a67 *tests/testthat/test_knitPrintListPlots.R
 aeca8954e1804c16455cbf86f52e12b4 *tests/testthat/test_label.R
 27c39e6fd950b1951e828495415595f8 *tests/testthat/test_loadDataADaMSDTM.R
 1c02ae76b60af0437c8ee8a31cb27d58 *tests/testthat/test_miscellaneous.R
@@ -87,4 +87,4 @@ aeca8954e1804c16455cbf86f52e12b4 *tests/testthat/test_label.R
 64cfaacf8adda74c5e369740a1a8b2b9 *tests/testthat/test_plots-palettesCDISC.R
 ee4ce248ff41a1173706f46d47eaba2d *tests/testthat/test_plots-utility.R
 b284e4f4b55fa25b8fc95116f8a3bf4c *tests/testthat/test_roundHalfUp.R
-e1310e8abe81091aaedbb470f7b06293 *vignettes/clinUtils-vignette.Rmd
+a4e0794e3f0094ca4e461698aafee38f *vignettes/clinUtils-vignette.Rmd

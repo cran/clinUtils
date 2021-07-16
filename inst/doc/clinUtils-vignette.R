@@ -164,7 +164,7 @@ roundHalfUp(c(0.45, 0.55), 1)
 round(c(0.45, 0.55), 1)
 
 
-## ----getClinDT, eval = rmarkdown::pandoc_available()--------------------------
+## ----createDataAE-------------------------------------------------------------
 
 dataTEAE <- subset(dataADaM$ADAE, SAFFL == "Y" & TRTEMFL == "Y")
 
@@ -176,6 +176,9 @@ labelVarsTEAE <- getLabelVar(
 colnamesTEAE <- setNames(names(labelVarsTEAE), labelVarsTEAE)
 
 dataTEAE <- dataTEAE[order(dataTEAE$AESOC), ]
+
+
+## ----getClinDT, eval = rmarkdown::pandoc_available()--------------------------
 
 getClinDT(
     dataTEAE, 

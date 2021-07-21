@@ -1,12 +1,12 @@
 Package: clinUtils
 Type: Package
 Title: General Utility Functions for Analysis of Clinical Data
-Version: 0.0.3
-Date: 2021-07-16
+Version: 0.0.4
+Date: 2021-07-20
 Authors@R: c(
-  person(given = "Laure", family = "Cougnaud", role = "aut",
+  person(given = "Laure", family = "Cougnaud", role = c("aut", "cre"),
   email = "laure.cougnaud@openanalytics.eu"),
-  person(given = "Michela", family = "Pasetto", role = c("aut", "cre"),
+  person(given = "Michela", family = "Pasetto", role = "aut",
   email = "michela.pasetto@openanalytics.eu"),
   person(given = "Open Analytics", role = "cph")
   )
@@ -28,10 +28,10 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 LazyData: true
 NeedsCompilation: no
-Packaged: 2021-07-16 12:07:18 UTC; mpasetto
-Author: Laure Cougnaud [aut],
-  Michela Pasetto [aut, cre],
+Packaged: 2021-07-20 11:16:37 UTC; mpasetto
+Author: Laure Cougnaud [aut, cre],
+  Michela Pasetto [aut],
   Open Analytics [cph]
-Maintainer: Michela Pasetto <michela.pasetto@openanalytics.eu>
+Maintainer: Laure Cougnaud <laure.cougnaud@openanalytics.eu>
 Repository: CRAN
-Date/Publication: 2021-07-16 14:50:06 UTC
+Date/Publication: 2021-07-21 04:50:07 UTC

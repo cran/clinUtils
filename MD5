@@ -1,4 +1,4 @@
-15d89c5bbc3574517a4cf44074069637 *DESCRIPTION
+0fdc37c5a1ee1c093e328e6e4212a6ed *DESCRIPTION
 01974937b40279205581a84931ae0cdf *LICENSE
 e151974ca5ac5916b5553d49cc229787 *NAMESPACE
 9a92fceec16bd81709758efa45fa9e4f *R/compareTables.R
@@ -13,16 +13,17 @@ e1f004938b95aa7768f514750e77055e *R/miscellaneous.R
 783bbb75498c0dd888ce76ceaab66d62 *R/plots-utility.R
 53669882f070d695536466a3ea853bc8 *R/roundHalfUp.R
 df2d99fe863ce452ca131df1ee43ab41 *R/table-getClinDT.R
-ef36bed7c1b0700f3a9d07fd7aa08fd4 *build/vignette.rds
+bd8a02cb5b4f510b032e4da17cfa9b2e *build/vignette.rds
 3434ba37d510af310d6af60ae089c3d4 *data/colorPaletteNRIND.RData
 0b0ea520b3e73b0daf249b6ef41c784e *data/dataADaMCDISCP01.RData
 ad855c424b1d378b4aefce999a56b347 *data/dataSDTMCDISCP01.RData
 d739c581586772f06c74f14b318319f3 *data/shapePaletteNRIND.RData
-f8d6dd0094b9c0bcbf4f668f83660d08 *inst/NEWS
+c757436c792a6c14dbbd5032b0464463 *inst/NEWS
+0c7e3976eea05090f207a999105e8295 *inst/doc/clinUtils-vignette.R
 424515537dab43179aa525f8279410ac *inst/doc/clinUtils-vignette.Rmd
-6fbbaa02f71e686975d9f934b24074b3 *inst/doc/clinUtils-vignette.html
+61784d4a29ca350d556bdc2d7beff88a *inst/doc/clinUtils-vignette.html
 ea40f9879933f5cbd0073e99004ad091 *inst/examples/compareTables-example.R
-a9cd1492ea9153ba8209857d660dafb9 *inst/examples/getClinDT-example.R
+03cc181b0c7b08738937415123c0085b *inst/examples/getClinDT-example.R
 60dc152dceaae346ada5d4df3022a3a5 *inst/examples/knitPrintListObjects-example.R
 bacf4b77261c10b3b1ee492fdf824a68 *inst/examples/knitPrintListPlots-example.R
 20263b9119ea28948a1203c1066e42b7 *inst/extdata/cdiscpilot01/SDTM/ae.xpt
@@ -55,7 +56,7 @@ ff98a6b953f252414c2a0050a3ccaf49 *man/formatDTBarVar.Rd
 3b5564c745d7a9f07acdad981b9b6baf *man/formatLongLabel.Rd
 0cae8f9565c9a0d22d57aa655c402ad7 *man/formatTableLabel.Rd
 e4feb73ff80e39f9fa11f3a049034907 *man/formatVarForPlotLabel.Rd
-2e9fbefc27112a6613a98f5e4cf1493c *man/getClinDT.Rd
+5f343ef74abfbdeb8c9fb746d542891e *man/getClinDT.Rd
 a781c6e64ec1553db3e0d23462930846 *man/getClinDTButtons.Rd
 982f01faa147435634e2dcaacc3f7764 *man/getColorPalette.Rd
 3a2bf744613ee755ad75dc1a22eb765c *man/getLabelParamcd.Rd
@@ -76,7 +77,7 @@ ccfb3433cf63eae245c9a0aaad8c714c *man/mergeDiffWithData.Rd
 09f4b1afb89d098c922045c9b27339cf *man/shapePaletteNRIND.Rd
 37ed3bcfae31fd313dab18c13add17d9 *man/simpleCap.Rd
 dec61d77c9260d36f6e7159f241baab4 *tests/testthat.R
-9ff1a6871696d27ac8670002d1f6ad9a *tests/testthat/test_compareTables.R
+2bc5b86d9d4773febe3bf979782ded5d *tests/testthat/test_compareTables.R
 d392e9bf64b2739000dba718c6104cb8 *tests/testthat/test_getClinDT.R
 1b2d80b3358f67288f8a5bf1f49f08a0 *tests/testthat/test_getLabel.R
 04ae6f06d9c2d35363d467c0242d8a1c *tests/testthat/test_knitPrintListPlots.R

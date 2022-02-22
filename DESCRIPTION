@@ -1,8 +1,8 @@
 Package: clinUtils
 Type: Package
 Title: General Utility Functions for Analysis of Clinical Data
-Version: 0.1.0
-Date: 2021-08-21
+Version: 0.1.1
+Date: 2022-02-22
 Authors@R: c(
   person(given = "Laure", family = "Cougnaud", role = c("aut", "cre"),
   email = "laure.cougnaud@openanalytics.eu"),
@@ -22,7 +22,8 @@ Imports: crosstalk, data.table, DT, haven, htmlwidgets, knitr, plyr,
         tools, utils, viridisLite
 Suggests: tibble, ggplot2, plotly, htmltools, pander, rmarkdown,
         testthat, flextable
-SystemRequirements: pandoc
+SystemRequirements: pandoc (for export clin DT to a file - inclusion of
+        list of interactive plots/objects with knitr)
 URL: https://github.com/openanalytics/clinUtils
 BugReports: https://github.com/openanalytics/clinUtils/issues
 License: MIT + file LICENSE
@@ -30,11 +31,11 @@ RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 LazyData: true
 NeedsCompilation: no
-Packaged: 2021-09-21 15:27:18 UTC; lcougnaud
+Packaged: 2022-02-22 11:05:42 UTC; root
 Author: Laure Cougnaud [aut, cre],
   Michela Pasetto [aut],
   Arne De Roeck [rev] (tests),
   Open Analytics [cph]
 Maintainer: Laure Cougnaud <laure.cougnaud@openanalytics.eu>
 Repository: CRAN
-Date/Publication: 2021-09-22 08:40:08 UTC
+Date/Publication: 2022-02-22 12:10:02 UTC

@@ -7,7 +7,7 @@ subjectsSafety <- subset(dataADaMCDISCP01$ADSL, SAFFL == "Y")$USUBJID
 
 # compute counts of subjects presenting each AE
 tableAE <- stats::aggregate(
-	formula = USUBJID ~ AESOC:AEDECOD,
+	USUBJID ~ AESOC:AEDECOD,
 	data = dataAE, 
 	FUN = function(usubjid)	length(unique(usubjid))
 )
@@ -54,7 +54,7 @@ getClinDT(
 )
 
 ## group per system organ class (and decreasing N):
-tableAESOC <- aggregate(formula = N ~ AESOC, data = tableAE, FUN = sum)
+tableAESOC <- aggregate(N ~ AESOC, data = tableAE, FUN = sum)
 tableAE$AESOC <- factor(tableAE$AESOC,
 	levels = tableAESOC[order(tableAESOC$N, decreasing = FALSE), "AESOC"]
 )

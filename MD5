@@ -1,4 +1,4 @@
-13c21c0a14744dc0ab7e1a93c9222fc4 *DESCRIPTION
+0dfa138d343295e9b5a8f3bfaa24f0ea *DESCRIPTION
 01974937b40279205581a84931ae0cdf *LICENSE
 e151974ca5ac5916b5553d49cc229787 *NAMESPACE
 9a92fceec16bd81709758efa45fa9e4f *R/compareTables.R
@@ -18,10 +18,10 @@ e725defa73ca8da7710bb8e17f5bd4b6 *build/vignette.rds
 0b0ea520b3e73b0daf249b6ef41c784e *data/dataADaMCDISCP01.RData
 ad855c424b1d378b4aefce999a56b347 *data/dataSDTMCDISCP01.RData
 d739c581586772f06c74f14b318319f3 *data/shapePaletteNRIND.RData
-225dedfd88f017463a4edf8f698538d3 *inst/NEWS
+792d2061cbd617d348b348ee55ee6536 *inst/NEWS
 0c7e3976eea05090f207a999105e8295 *inst/doc/clinUtils-vignette.R
 424515537dab43179aa525f8279410ac *inst/doc/clinUtils-vignette.Rmd
-d1006d3d4bffefb7b681a3a9f2f2bca8 *inst/doc/clinUtils-vignette.html
+4d5defe49311578e2517b20bb149de2d *inst/doc/clinUtils-vignette.html
 495752611901fc98801e3ae2990a491a *inst/examples/compareTables-example.R
 ed3980791fb8549a80f88e6dbfda3402 *inst/examples/getClinDT-example.R
 60dc152dceaae346ada5d4df3022a3a5 *inst/examples/knitPrintListObjects-example.R
@@ -80,7 +80,7 @@ ccfb3433cf63eae245c9a0aaad8c714c *man/mergeDiffWithData.Rd
 2bc5b86d9d4773febe3bf979782ded5d *tests/testthat/test_compareTables.R
 d392e9bf64b2739000dba718c6104cb8 *tests/testthat/test_getClinDT.R
 1b2d80b3358f67288f8a5bf1f49f08a0 *tests/testthat/test_getLabel.R
-04ae6f06d9c2d35363d467c0242d8a1c *tests/testthat/test_knitPrintListPlots.R
+9a046ac1aefc4858dd762d80979b1bba *tests/testthat/test_knitPrintListPlots.R
 5e273b5e55c0bf2cb89c9c2e9815d0d2 *tests/testthat/test_label.R
 05c4d2897cbe73a705c6eeecb021e167 *tests/testthat/test_loadDataADaMSDTM.R
 b5210c6fbb4ef8b7637e65c686bed994 *tests/testthat/test_miscellaneous.R

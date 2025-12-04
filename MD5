@@ -1,4 +1,4 @@
-9cdc373f97344018ab0c235b8ae418ae *DESCRIPTION
+74dd2391608c3ca880baf0cc8f7ff8b8 *DESCRIPTION
 01974937b40279205581a84931ae0cdf *LICENSE
 e151974ca5ac5916b5553d49cc229787 *NAMESPACE
 4133982ab2f75c16eebaadbf27411527 *R/compareTables.R
@@ -13,15 +13,15 @@ e1f004938b95aa7768f514750e77055e *R/miscellaneous.R
 806066cf8daf790cbe538c6bfdf11497 *R/plots-utility.R
 a8c70ef422341ce07778b0c83f37bda6 *R/roundHalfUp.R
 50d2f187b4a113faed3889951805671f *R/table-getClinDT.R
-b4c62ed481fc67cce4a795702558c783 *build/vignette.rds
+b1dd778f870a46f8af487206dd0d71d8 *build/vignette.rds
 3434ba37d510af310d6af60ae089c3d4 *data/colorPaletteNRIND.RData
-f7dce6e719727547edf4a1c809b102e5 *data/dataADaMCDISCP01.RData
-6d2fd558267f2977a3aa9c1dea4f718b *data/dataSDTMCDISCP01.RData
+15a50c820ec800579fe0f3895fce5af1 *data/dataADaMCDISCP01.RData
+4cae540bb9753bc5845ea21fff8d2339 *data/dataSDTMCDISCP01.RData
 d739c581586772f06c74f14b318319f3 *data/shapePaletteNRIND.RData
-d6d61e5b7d03b063ba7fa5aa0ee34291 *inst/NEWS
+9de70126e0063762e4c2db0b086133c5 *inst/NEWS
 0c7e3976eea05090f207a999105e8295 *inst/doc/clinUtils-vignette.R
 424515537dab43179aa525f8279410ac *inst/doc/clinUtils-vignette.Rmd
-d122b1899f704de5fefbeb2d18aad37c *inst/doc/clinUtils-vignette.html
+8277c34d1a9fe46fe1244294dee3f3d5 *inst/doc/clinUtils-vignette.html
 495752611901fc98801e3ae2990a491a *inst/examples/compareTables-example.R
 ed3980791fb8549a80f88e6dbfda3402 *inst/examples/getClinDT-example.R
 60dc152dceaae346ada5d4df3022a3a5 *inst/examples/knitPrintListObjects-example.R
@@ -81,7 +81,7 @@ a9ff09eb5030df018382d5d27265bc51 *man/shapePaletteNRIND.Rd
 37ed3bcfae31fd313dab18c13add17d9 *man/simpleCap.Rd
 35926355422b0d2286ab68a8d96dbede *tests/testthat.R
 2bc5b86d9d4773febe3bf979782ded5d *tests/testthat/test_compareTables.R
-d392e9bf64b2739000dba718c6104cb8 *tests/testthat/test_getClinDT.R
+d00237d1ba39412cbe10cf3880dfea37 *tests/testthat/test_getClinDT.R
 1b2d80b3358f67288f8a5bf1f49f08a0 *tests/testthat/test_getLabel.R
 9a046ac1aefc4858dd762d80979b1bba *tests/testthat/test_knitPrintListPlots.R
 5e273b5e55c0bf2cb89c9c2e9815d0d2 *tests/testthat/test_label.R
